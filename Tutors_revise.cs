@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -21,8 +21,32 @@ namespace TJ_Tutors_Management_System
         {
             CmbDataGridview cmbd = new CmbDataGridview();
             string mystr = "SELECT 教员编号,教员姓名,经办状态,经办时间,经办人,处理备注 FROM [Parents-Tutors] WHERE " +
-                "打印编号='" + print_num1 + "'";
+                "打印编号='" + print_num1 + "' ORDER BY (SELECT right(经办时间,10)) DESC";
             cmbd.bind(dgv_tutors, mystr, "Parents-Tutors");
+        }
+
+        private void txt_parent_num_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!(Char.IsNumber(e.KeyChar)) && e.KeyChar != (char)8)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txt_print_num_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!(Char.IsNumber(e.KeyChar)) && e.KeyChar != (char)8)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txt_tutor_price_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!(Char.IsNumber(e.KeyChar)) && e.KeyChar != (char)8)
+            {
+                e.Handled = true;
+            }
         }
 
         private void 家教业务办理ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -34,8 +58,9 @@ namespace TJ_Tutors_Management_System
                 string state1 = dgv_tutors.SelectedRows[0].Cells[2].Value.ToString();
                 string remarks = dgv_tutors.SelectedRows[0].Cells[5].Value.ToString();
                 string[] state = state1.Split(' ');
-                string tempstate = state.Last();
-                Tutors_management myform = new Tutors_management(parent_num1, print_num1, payyes1,tutors_num,tutors_name,tempstate,remarks);
+                string tempstate = state.Last();               
+                Tutors_management myform = new Tutors_management(parent_num1, print_num1, payyes1, tutors_num, 
+                    tutors_name, tempstate, remarks, tutors_state1);
                 myform.UpDate2 += new UpDateHandle2(myform_UpDate2);
                 myform.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
                 myform.Show();
@@ -146,7 +171,7 @@ namespace TJ_Tutors_Management_System
                     Payment myform = new Payment(parent_num1, print_num1,payment_state1);
                     myform.UpDate += new UpDateHandle(myform_UpDate);
                     myform.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-                    myform.Show();
+                    myform.ShowDialog();
                 }
             }
         }
@@ -157,23 +182,31 @@ namespace TJ_Tutors_Management_System
         }
         private void btn_management_Click(object sender, EventArgs e)
         {
-            Tutors_management myform = new Tutors_management(parent_num1,print_num1,payyes1);
+            string payment_state = cbo_payment_state.Text;
+            Tutors_management myform = new Tutors_management(parent_num1,print_num1,payyes1,payment_state);
             myform.UpDate2 += new UpDateHandle2(myform_UpDate2);
             myform.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            myform.Show();
+            myform.ShowDialog();
         }
-        void myform_UpDate2(string state,string time)
+        void myform_UpDate2(string state,string time,string payment_state)
         {
             tutors_state1 = state;    
             cbo_tutor_state.Text = state;
             time1 = time;
+            cbo_payment_state.SelectedItem = payment_state;
+            /*  string mysql = "SELECT 教员编号,教员姓名,经办状态,经办时间,经办人,处理备注 FROM [Parents-Tutors] WHERE " +
+                  "打印编号='" + print_num1 + "' ORDER BY 经办时间 DESC";
+              DataSet mydataset = mydb.ExecuteQuery(mysql, "Parents-Tutors");
+              dgv_tutors.DataSource = mydataset.Tables["Parents-Tutors"];
+              CCTRS ctr = new CCTRS();
+              ctr.ColorDataGridView(dgv_tutors);*/
             CmbDataGridview cmbd = new CmbDataGridview();
             CCTRS ctr = new CCTRS();
             ctr.ColorDataGridView(dgv_tutors);
-            string mysql = "SELECT 教员编号,教员姓名,经办状态,经办时间,经办人,处理备注 FROM [Parents-Tutors] WHERE " +
-                "打印编号='" + print_num1 + "'";
-            DataSet mydataset = mydb.ExecuteQuery(mysql, "Parents-Tutors");
-            dgv_tutors.DataSource = mydataset.Tables["Parents-Tutors"];
+            string mystr = "SELECT 教员编号,教员姓名,经办状态,经办时间,经办人,处理备注 FROM [Parents-Tutors] WHERE " +
+                "打印编号='" + print_num1 + "' ORDER BY (SELECT right(经办时间,10)) DESC";
+            dgv_tutors.DataSource = null;
+            cmbd.bind(dgv_tutors, mystr, "Parents-Tutors");
         }
         private void btnclose_Click(object sender, EventArgs e)
         {
@@ -232,7 +265,12 @@ namespace TJ_Tutors_Management_System
                     MessageBox.Show("请输入联系方式！", "操作提示", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
-                
+                if (txt_phone.TextLength > 11)
+                {
+                    MessageBox.Show("联系方式不得超过11位！请重新输入！", "操作提示", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    txt_phone.Text = "";
+                    return;
+                }
                 if (txt_sadd.Text == "")
                 {
                     MessageBox.Show("请输入家教地址（简单）！", "操作提示", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -345,7 +383,7 @@ namespace TJ_Tutors_Management_System
             CCTRS ctr = new CCTRS();
             ctr.ColorDataGridView(dgv_tutors);
             string mystr = "SELECT 教员编号,教员姓名,经办状态,经办时间,经办人,处理备注 FROM [Parents-Tutors] WHERE " +
-                "打印编号='"+print_num1+"'";
+                "打印编号='"+print_num1+ "' ORDER BY (SELECT right(经办时间,10)) DESC";
             cmbd.bind(dgv_tutors, mystr, "Parents-Tutors");
             txt_parent_num.Text = parent_num1;
             txt_print_num.Text = print_num1;
