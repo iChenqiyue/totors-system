@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,22 +9,30 @@ using System.Windows.Forms;
 
 namespace TJ_Tutors_Management_System
 {
-    public delegate void UpDateHandle2(string state,string time); //定义委托  
+    public delegate void UpDateHandle2(string state,string time,string payment_state); //定义委托  
      
     public partial class Tutors_management : Form
     {
         public UpDateHandle2 UpDate2;
 
         string parent_num1, print_num1, tutors_num1, tutors_name1, state1, time1, principal1,
-            ID, ID2,payyes1, remarks1, tempstate;
+            ID, ID2, payyes1, remarks1, tempstate, payment_state1;
         bool flag = false,flag2=false;
         CommDB mydb = new CommDB();//
 
-       /* private void cbo_state_SelectedIndexChanged(object sender, EventArgs e)
+        private void cbo_tutors_num_KeyPress(object sender, KeyPressEventArgs e)
         {
-            cbo_tutors_state.SelectedItem = cbo_state.SelectedItem;
+            if (!(Char.IsNumber(e.KeyChar)) && e.KeyChar != (char)8)
+            {
+                e.Handled = true;
+            }
+        }
 
-        }*/
+        /* private void cbo_state_SelectedIndexChanged(object sender, EventArgs e)
+         {
+             cbo_tutors_state.SelectedItem = cbo_state.SelectedItem;
+
+         }*/
 
         private void cbo_tutors_num_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -76,7 +84,7 @@ namespace TJ_Tutors_Management_System
             Students_Inquire myform = new Students_Inquire(2);
             myform.UpDate3 += new UpDateHandle3(myform_UpDate3);
             myform.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            myform.Show();
+            myform.ShowDialog();
         }
         void myform_UpDate3(string num,string name)/////这里要改！！！
         {
@@ -88,14 +96,16 @@ namespace TJ_Tutors_Management_System
 
         }
 
-        public Tutors_management(string parent_num, string print_num,string payyes)
+        public Tutors_management(string parent_num, string print_num,string payyes,string payment_state)
         {
             InitializeComponent();
             parent_num1 = parent_num;
             print_num1 = print_num;            
             payyes1 = payyes;
+            payment_state1 = payment_state;
         }
-        public Tutors_management(string parent_num, string print_num, string payyes,string tutors_num,string tutors_name,string state,string remarks)
+        public Tutors_management(string parent_num, string print_num, string payyes, string tutors_num, string tutors_name, 
+            string state, string remarks,string tutors_state)
         {
             InitializeComponent();
             parent_num1 = parent_num;
@@ -105,6 +115,7 @@ namespace TJ_Tutors_Management_System
             tutors_name1 = tutors_name;
             state1 = state;
             remarks1 = remarks;
+            cbo_tutors_state.Text = tutors_state;
         }
         private void Tutors_management_Load(object sender, EventArgs e)
         {
@@ -115,8 +126,8 @@ namespace TJ_Tutors_Management_System
             string mysql = string.Format("SELECT distinct 教员编号 FROM [Parents-Tutors] WHERE 家长编号='{0}' " +
                 "AND 打印编号='{1}'", parent_num1, print_num1);
             cmbc.cboDataBind(cbo_tutors_num, mysql, "Parents-Tutors", "教员编号");
-            if(tutors_num1!="")
-            cbo_tutors_num.Text = tutors_num1;
+            if (tutors_num1 != "")
+                cbo_tutors_num.Text = tutors_num1;
             if (tutors_name1 != "")
                 txt_tutors_name.Text = tutors_name1;
             if (state1 != "")
@@ -162,8 +173,16 @@ namespace TJ_Tutors_Management_System
                     state1 += " " + cbo_state.Text;
                     principal1 += " " + cbo_principal.Text;
                     time1 += " " + dt_time.Value.ToString("yyyy/MM/dd");
-                string mysql = string.Format("UPDATE [Parents] SET 家教状态='{0}',经办时间='{1}',进行状态='{2}' WHERE " +
-                    "ID='{3}'", cbo_tutors_state.Text, dt_time.Value.ToString("yyyy/MM/dd"), state1,ID);
+             /*   if (payment_state1 == "待缴" && cbo_tutors_state.Text == "换人")
+                {
+                    payment_state1 = "无需缴纳";
+                }
+                if (payment_state1 == "待缴" && cbo_tutors_state.Text == "不请")
+                {
+                    payment_state1 = "无需缴纳";
+                }*/
+                    string mysql = string.Format("UPDATE [Parents] SET 家教状态='{0}',经办时间='{1}',缴费状态='{2}' WHERE " +
+                    "ID='{3}'", cbo_tutors_state.Text, dt_time.Value.ToString("yyyy/MM/dd"),payment_state1,ID);
                 try
                 {
                     mydb.ExecuteNonQuery(mysql);
@@ -235,10 +254,11 @@ namespace TJ_Tutors_Management_System
                     mydb.ExecuteNonQuery(mysql);
                     this.Close();
                     //                  UpDate2(cbo_state.Text,state1,time1);
-                    UpDate2(cbo_tutors_state.SelectedItem.ToString(), dt_time.Value.ToString("yyyy/MM/dd"));
+                    UpDate2(cbo_tutors_state.SelectedItem.ToString(), dt_time.Value.ToString("yyyy/MM/dd"),payment_state1);
                 }
                 catch (Exception ex)
                 {
+
                     MessageBox.Show(ex.Message, "操作数据库出错！", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
             }
