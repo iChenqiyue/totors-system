@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -17,11 +17,35 @@ namespace TJ_Tutors_Management_System
         string ID1,tutors_num1, tutors_name1, student_num1, grade_subject1,
                     tutors_degree1, sex1, phone1, place1, blacklist1, imprisonment1, remarks1;
 
+        private void txt_num_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!(Char.IsNumber(e.KeyChar)) && e.KeyChar != (char)8)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txt_student_num_KeyPress_1(object sender, KeyPressEventArgs e)
+        {
+            if (!(Char.IsNumber(e.KeyChar)) && e.KeyChar != (char)8)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txt_phone_KeyPress_1(object sender, KeyPressEventArgs e)
+        {
+            if (!(Char.IsNumber(e.KeyChar)) && e.KeyChar != (char)8)
+            {
+                e.Handled = true;
+            }
+        }
+
         private void btn_refresh_Click(object sender, EventArgs e)
         {
-            CmbDataGridview cmbd = new CmbDataGridview();
+            CmbDataGridview cmbd = new CmbDataGridview();            
             string mystr = "SELECT 家长编号,打印编号,经办状态,经办时间,经办人,处理备注 FROM [Tutors-Parents] WHERE " +
-                "教员编号='" + tutors_num1 + "'";
+                "教员编号='" + tutors_num1 + "'"+ " ORDER BY (SELECT right(经办时间,10)) DESC";
             cmbd.bind(dgv_parents, mystr, "Tutors-Parents");
         }
 
@@ -40,47 +64,47 @@ namespace TJ_Tutors_Management_System
             {
                 string parents_num = dgv_parents.SelectedRows[0].Cells[0].Value.ToString();
                 string print_num = dgv_parents.SelectedRows[0].Cells[1].Value.ToString();
-                string mysql = "SELECT 接待人 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                string mysql = "SELECT 接待人 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string reception = mydb.Returnafield(mysql);
-                mysql = "SELECT ID FROM [Parents] WHERE 家长编号='" + parents_num + "'";
-                string ID = mydb.Returnafield(mysql);
-                mysql = "SELECT 接入时间 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT ID FROM [Parents] WHERE 打印编号='" + print_num + "'";
+                string ID= mydb.Returnafield(mysql);
+                mysql = "SELECT 接入时间 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string reception_time = mydb.Returnafield(mysql);
-                mysql = "SELECT 家长称呼 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 家长称呼 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string parents_name = mydb.Returnafield(mysql);
-                mysql = "SELECT 联系方式 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 联系方式 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string phone = mydb.Returnafield(mysql);
-                mysql = "SELECT 家教地址简单 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 家教地址简单 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string sadd = mydb.Returnafield(mysql);
-                mysql = "SELECT 家教地址详细 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 家教地址详细 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string dadd = mydb.Returnafield(mysql);
-                mysql = "SELECT 年级科目 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 年级科目 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string grade_subject = mydb.Returnafield(mysql);
-                mysql = "SELECT 学员性别 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 学员性别 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string student_sex = mydb.Returnafield(mysql);
-                mysql = "SELECT 家教价格 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 家教价格 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string tutors_price = mydb.Returnafield(mysql);
-                mysql = "SELECT 家教时间 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 家教时间 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string tutors_time = mydb.Returnafield(mysql);
-                mysql = "SELECT 教员要求性别 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 教员要求性别 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string sex = mydb.Returnafield(mysql);
-                mysql = "SELECT 教员要求地域 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 教员要求地域 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string place = mydb.Returnafield(mysql);
-                mysql = "SELECT 教员要求年级 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 教员要求年级 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string grade = mydb.Returnafield(mysql);
-                mysql = "SELECT 教员要求专业 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 教员要求专业 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string subject = mydb.Returnafield(mysql);
-                mysql = "SELECT 教员要求其他 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 教员要求其他 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string others = mydb.Returnafield(mysql);
-                mysql = "SELECT 家教状态 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 家教状态 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string tutors_state = mydb.Returnafield(mysql);
-                mysql = "SELECT 经办时间 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 经办时间 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string time = mydb.Returnafield(mysql);
-                mysql = "SELECT 重要备注 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 重要备注 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string remarks = mydb.Returnafield(mysql);
-                mysql = "SELECT 缴费状态 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 缴费状态 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string payment_state = mydb.Returnafield(mysql);
-                mysql = "SELECT 缴费时间 FROM [Parents] WHERE 家长编号='" + parents_num + "'";
+                mysql = "SELECT 缴费时间 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string payment_time = mydb.Returnafield(mysql);
                 Tutors_check myform = new Tutors_check(ID, parents_num, print_num, parents_name, phone, grade_subject, student_sex,
                     tutors_state, time, tutors_price, tutors_time, dadd, remarks, payment_state, payment_time);
@@ -100,7 +124,7 @@ namespace TJ_Tutors_Management_System
                 string mysql = "SELECT 接待人 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string reception = mydb.Returnafield(mysql);
                 mysql = "SELECT ID FROM [Parents] WHERE 打印编号='" + print_num + "'";
-                string ID= mydb.Returnafield(mysql);
+                string ID = mydb.Returnafield(mysql);
                 mysql = "SELECT 接入时间 FROM [Parents] WHERE 打印编号='" + print_num + "'";
                 string reception_time = mydb.Returnafield(mysql);
                 mysql = "SELECT 家长称呼 FROM [Parents] WHERE 打印编号='" + print_num + "'";
@@ -221,6 +245,12 @@ namespace TJ_Tutors_Management_System
                     MessageBox.Show("请输入联系方式！", "操作提示", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
+                if (txt_phone.TextLength > 11)
+                {
+                    MessageBox.Show("联系方式不得超过11位！请重新输入！", "操作提示", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    txt_phone.Text = "";
+                    return;
+                }
                 i = mydb.Rownum("SELECT * FROM [Tutors] WHERE 联系方式='" + txt_phone.Text.Trim() + "'");
                 if (i > 0 && txt_phone.Text.Trim() != phone1)
                 {
@@ -271,7 +301,7 @@ namespace TJ_Tutors_Management_System
             CCTRS ctr = new CCTRS();
             ctr.ColorDataGridView(dgv_parents);
             string mystr = "SELECT 家长编号,打印编号,经办状态,经办时间,经办人,处理备注 FROM [Tutors-Parents] WHERE " +
-                "教员编号='" + tutors_num1 + "'";
+                "教员编号='" + tutors_num1 + "'"+ " ORDER BY (SELECT right(经办时间,10)) DESC";
             cmbd.bind(dgv_parents, mystr, "Tutors-Parents");
             txt_num.Text = tutors_num1;
             txt_student_name.Text = tutors_name1;
